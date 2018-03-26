@@ -56,6 +56,33 @@
                 </select>
             </div>
             <p></p>
+            
+            <div class="input-group input-group-md" [hidden]="frequency == 'biweekly'">
+                <label for="dayOfPayA" class="label label-info">Pay A</label>
+                <input type="number" class="form-control" placeholder="Day of Pay A" id="dayOfPayA"
+                       name="dayOfPayA"
+                       [(ngModel)]="model.dayOfPayA"
+                       #dayOfPayA="ngModel"/>
+                <div [hidden]="dayOfPayA.valid || dayOfPayA.pristine" class="alert alert-danger">
+                    Pay A is required.
+                </div>
+            </div>
+            <p></p>
+            
+            <div class="input-group input-group-md" [hidden]="frequency == 'biweekly'">
+                <label for="dayOfPayB" class="label label-info">Pay B</label>
+                <input type="number" class="form-control" placeholder="Pay B" id="dayOfPayB"
+                       name="dayOfPayB"
+                       [(ngModel)]="model.dayOfPayB"
+                       #dayOfPayB="ngModel"/>
+                <div [hidden]="dayOfPayB.valid || dayOfPayB.pristine" class="alert alert-danger">
+                    Pay B is required.
+                </div>
+            </div>
+            <p></p>
+
+            
+            
 
             <div class="input-group input-group-md">
                 <label for="starting-date" class="label label-info">Starting Date</label>

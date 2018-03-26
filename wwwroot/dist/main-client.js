@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "5137ade0882b0a97acaa"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "27d0aaf9c7be197252b6"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -1816,9 +1816,19 @@ var AccrualCalculator = (function () {
     function AccrualCalculator(config) {
         this.config = config;
     }
+    AccrualCalculator.addMonths = function (date, number) {
+        var result = new Date(date);
+        result.setMonth(result.getMonth() + number);
+        return result;
+    };
     AccrualCalculator.addDays = function (date, days) {
         var result = new Date(date);
         result.setDate(result.getDate() + days);
+        return result;
+    };
+    AccrualCalculator.setDate = function (date, dayOfMonth) {
+        var result = new Date(date);
+        result.setDate(dayOfMonth);
         return result;
     };
     AccrualCalculator.prototype.Calculate = function () {
@@ -1831,20 +1841,54 @@ var AccrualCalculator = (function () {
             currentAccrual: accrual,
         };
         rows.push(startingRow);
-        var currentDate = new Date(this.config.startingDate);
-        var endDate = new Date(2018, 12, 31);
-        console.log(currentDate);
-        console.log(endDate);
+        var parts = this.config.startingDate.split('-');
+        var currentDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        var endDate = new Date(new Date().getFullYear(), 12, 0);
+        console.log("endDate=" + endDate);
+        var addYears = 0;
+        switch (this.config.ending) {
+            case Ending.PlusOne:
+                addYears = 1;
+                break;
+            case Ending.PlusTwo:
+                addYears = 2;
+                break;
+            case Ending.PlusThree:
+                addYears = 3;
+                break;
+        }
+        endDate.setFullYear(endDate.getFullYear() + addYears);
+        var counter = 0;
         while (currentDate <= endDate) {
+            counter++;
+            if (counter === 10) {
+                // return rows;
+            }
             accrual += this.config.accrualRate;
             var row = {
                 isStarting: false,
-                accrualDate: currentDate,
+                accrualDate: new Date(currentDate),
                 hoursUsed: 0,
                 currentAccrual: accrual,
             };
             rows.push(row);
-            currentDate = AccrualCalculator.addDays(currentDate, 14);
+            if (this.config.frequency == Frequency.BiWeekly) {
+                currentDate = AccrualCalculator.addDays(currentDate, 14);
+            }
+            else {
+                var day = currentDate.getDate();
+                if (day >= this.config.dayOfPayB) {
+                    // let updatedDate = AccrualCalculator.addMonths(currentDate, 1);
+                    // updatedDate = AccrualCalculator.setDate(currentDate, days.a);
+                    // currentDate = updatedDate;
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                    currentDate.setDate(this.config.dayOfPayA);
+                }
+                else {
+                    // currentDate = AccrualCalculator.setDate(currentDate, days.b);
+                    currentDate.setDate(this.config.dayOfPayB);
+                }
+            }
         }
         return rows;
     };
@@ -1864,27 +1908,18 @@ var PtoCalculatorComponent = (function () {
             { value: 'plus-three', display: '+3 Years' },
         ];
         this.model = new PtoConfiguration();
-        var config = {
-            startingHours: 55,
-            accrualRate: 7,
-            frequency: Frequency.SemiMonthly,
-            startingDate: new Date(2018, 3, 21),
-            ending: Ending.CurrentYear,
-        };
+        var config = new PtoConfiguration();
+        config.startingHours = 0;
+        config.accrualRate = 7;
+        config.frequency = Frequency.SemiMonthly;
+        config.startingDate = "2018-01-02";
+        config.dayOfPayA = 6;
+        config.dayOfPayB = 21;
+        config.ending = Ending.CurrentYear;
         this.rows = new AccrualCalculator(config).Calculate();
     }
     PtoCalculatorComponent.prototype.run = function () {
-        // const config: PtoConfiguration = {
-        //     startingHours: 10,
-        //     accrualRate: 7,
-        //     frequency: Frequency.SemiMonthly,
-        //     startingDate: new Date(2018, 3, 25),
-        //     ending: Ending.CurrentYear,
-        // };
-        console.log(this.model);
-        var rows = new AccrualCalculator(this.model).Calculate();
-        console.log(rows);
-        this.rows = rows;
+        this.rows = new AccrualCalculator(this.model).Calculate();
     };
     PtoCalculatorComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
@@ -2301,7 +2336,7 @@ module.exports = "<div class='main-nav'>\r\n    <div class='navbar navbar-invers
 /* 29 */
 /***/ (function(module, exports) {
 
-module.exports = "<h1>PTO Accrual Calculator</h1>\n\n<div class=\"row\">\n    <div class=\"col-md-8\">\n        <table class=\"table\">\n            <thead>\n            <tr>\n                <td><strong>Date</strong></td>\n                <td><strong>Used</strong></td>\n                <td><strong>Accrued</strong></td>\n            </tr>\n            </thead>\n            <tbody>\n            <tr *ngFor=\"let row of rows\">\n                <td *ngIf=\"row.isStarting\">Starting Accrural</td>\n                <td *ngIf=\"!row.isStarting\">{{row.accrualDate.toDateString()}}</td>\n                <td>{{row.hoursUsed}}</td>\n                <td>{{row.currentAccrual}}</td>\n            </tr>\n            </tbody>\n        </table>\n    </div>\n    <div class=\"col-md-4\">\n        <h3 style=\"margin-top: 0;padding-top: 0;\">Configuration</h3>\n        <form (ngSubmit)=\"run()\" #configForm=\"ngForm\">\n            <div class=\"input-group input-group-md\">\n                <label for=\"starting-hours\" class=\"label label-info\">Starting Hours</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Starting Hours\" id=\"starting-hours\"\n                       name=\"starting-hours\" required\n                       [(ngModel)]=\"model.startingHours\"\n                       #startingHours=\"ngModel\"/>\n                <div [hidden]=\"startingHours.valid || startingHours.pristine\" class=\"alert alert-danger\">\n                    Starting Hours is required.\n                </div>\n            </div>\n            <p></p>\n\n            <div class=\"input-group input-group-md\">\n                <label for=\"accrual-rate\" class=\"label label-info\">Accrual Rate</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Accrual Rate\" id=\"accrual-rate\"\n                       name=\"accrual-rate\" required\n                       [(ngModel)]=\"model.accrualRate\"\n                       #accrualRate=\"ngModel\"/>\n                <div [hidden]=\"accrualRate.valid || accrualRate.pristine\" class=\"alert alert-danger\">\n                    Accrual Rate is required.\n                </div>\n            </div>\n            <p></p>\n\n            <div class=\"input-group input-group-md\">\n                <label for=\"frequency\" class=\"label label-info\">Frequency</label>\n                <select class=\"form-control selectpicker\"  data-width=\"100%\" id=\"frequency\" name=\"frequency\" required\n                        [(ngModel)]=\"model.frequency\"\n                        #frequency=\"ngModel\">\n                    <option *ngFor=\"let f of frequencies\" [value]=\"f.value\">{{f.display}}</option>\n                </select>\n            </div>\n            <p></p>\n\n            <div class=\"input-group input-group-md\">\n                <label for=\"starting-date\" class=\"label label-info\">Starting Date</label>\n                <input type=\"date\" class=\"form-control\" placeholder=\"(mm/dd/yyyy)\" id=\"starting-date\"\n                       name=\"starting-date\"\n                       [(ngModel)]=\"model.startingDate\"\n                       #startingDate=\"ngModel\"/>\n                <div [hidden]=\"startingDate.valid || startingDate.pristine\" class=\"alert alert-danger\">\n                    Starting Date is required.\n                </div>\n            </div>\n            <p></p>\n\n            <div class=\"input-group input-group-md\">\n                <label for=\"ending\" class=\"label label-info\">Ending</label>\n                <select class=\"form-control\" data-width=\"fit\" id=\"ending\" name=\"ending\" required\n                        [(ngModel)]=\"model.ending\"\n                        #ending=\"ngModel\">\n                    <option *ngFor=\"let e of endings\" [value]=\"e.value\">{{e.display}}</option>\n                </select>\n            </div>\n            <p></p>\n\n\n            <div class=\"input-group input-group-md\">\n                <button class=\"btn btn-success\" name=\"calculate\" [disabled]=\"!configForm.form.valid\">Calculate!</button>\n            </div>\n            <p></p>\n\n            <pre>\n            {{model | json}}\n            </pre>\n        </form>\n    </div>\n</div>\n";
+module.exports = "<h1>PTO Accrual Calculator</h1>\n\n<div class=\"row\">\n    <div class=\"col-md-8\">\n        <table class=\"table\">\n            <thead>\n            <tr>\n                <td><strong>Date</strong></td>\n                <td><strong>Used</strong></td>\n                <td><strong>Accrued</strong></td>\n            </tr>\n            </thead>\n            <tbody>\n            <tr *ngFor=\"let row of rows\">\n                <td *ngIf=\"row.isStarting\">Starting Accrural</td>\n                <td *ngIf=\"!row.isStarting\">{{row.accrualDate.toDateString()}}</td>\n                <td>{{row.hoursUsed}}</td>\n                <td>{{row.currentAccrual}}</td>\n            </tr>\n            </tbody>\n        </table>\n    </div>\n    <div class=\"col-md-4\">\n        <h3 style=\"margin-top: 0;padding-top: 0;\">Configuration</h3>\n        <form (ngSubmit)=\"run()\" #configForm=\"ngForm\">\n            <div class=\"input-group input-group-md\">\n                <label for=\"starting-hours\" class=\"label label-info\">Starting Hours</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Starting Hours\" id=\"starting-hours\"\n                       name=\"starting-hours\" required\n                       [(ngModel)]=\"model.startingHours\"\n                       #startingHours=\"ngModel\"/>\n                <div [hidden]=\"startingHours.valid || startingHours.pristine\" class=\"alert alert-danger\">\n                    Starting Hours is required.\n                </div>\n            </div>\n            <p></p>\n\n            <div class=\"input-group input-group-md\">\n                <label for=\"accrual-rate\" class=\"label label-info\">Accrual Rate</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Accrual Rate\" id=\"accrual-rate\"\n                       name=\"accrual-rate\" required\n                       [(ngModel)]=\"model.accrualRate\"\n                       #accrualRate=\"ngModel\"/>\n                <div [hidden]=\"accrualRate.valid || accrualRate.pristine\" class=\"alert alert-danger\">\n                    Accrual Rate is required.\n                </div>\n            </div>\n            <p></p>\n\n            <div class=\"input-group input-group-md\">\n                <label for=\"frequency\" class=\"label label-info\">Frequency</label>\n                <select class=\"form-control selectpicker\"  data-width=\"100%\" id=\"frequency\" name=\"frequency\" required\n                        [(ngModel)]=\"model.frequency\"\n                        #frequency=\"ngModel\">\n                    <option *ngFor=\"let f of frequencies\" [value]=\"f.value\">{{f.display}}</option>\n                </select>\n            </div>\n            <p></p>\n            \n            <div class=\"input-group input-group-md\" [hidden]=\"frequency == 'biweekly'\">\n                <label for=\"dayOfPayA\" class=\"label label-info\">Pay A</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Day of Pay A\" id=\"dayOfPayA\"\n                       name=\"dayOfPayA\"\n                       [(ngModel)]=\"model.dayOfPayA\"\n                       #dayOfPayA=\"ngModel\"/>\n                <div [hidden]=\"dayOfPayA.valid || dayOfPayA.pristine\" class=\"alert alert-danger\">\n                    Pay A is required.\n                </div>\n            </div>\n            <p></p>\n            \n            <div class=\"input-group input-group-md\" [hidden]=\"frequency == 'biweekly'\">\n                <label for=\"dayOfPayB\" class=\"label label-info\">Pay B</label>\n                <input type=\"number\" class=\"form-control\" placeholder=\"Pay B\" id=\"dayOfPayB\"\n                       name=\"dayOfPayB\"\n                       [(ngModel)]=\"model.dayOfPayB\"\n                       #dayOfPayB=\"ngModel\"/>\n                <div [hidden]=\"dayOfPayB.valid || dayOfPayB.pristine\" class=\"alert alert-danger\">\n                    Pay B is required.\n                </div>\n            </div>\n            <p></p>\n\n            \n            \n\n            <div class=\"input-group input-group-md\">\n                <label for=\"starting-date\" class=\"label label-info\">Starting Date</label>\n                <input type=\"date\" class=\"form-control\" placeholder=\"(mm/dd/yyyy)\" id=\"starting-date\"\n                       name=\"starting-date\"\n                       [(ngModel)]=\"model.startingDate\"\n                       #startingDate=\"ngModel\"/>\n                <div [hidden]=\"startingDate.valid || startingDate.pristine\" class=\"alert alert-danger\">\n                    Starting Date is required.\n                </div>\n            </div>\n            <p></p>\n\n            <div class=\"input-group input-group-md\">\n                <label for=\"ending\" class=\"label label-info\">Ending</label>\n                <select class=\"form-control\" data-width=\"fit\" id=\"ending\" name=\"ending\" required\n                        [(ngModel)]=\"model.ending\"\n                        #ending=\"ngModel\">\n                    <option *ngFor=\"let e of endings\" [value]=\"e.value\">{{e.display}}</option>\n                </select>\n            </div>\n            <p></p>\n\n\n            <div class=\"input-group input-group-md\">\n                <button class=\"btn btn-success\" name=\"calculate\" [disabled]=\"!configForm.form.valid\">Calculate!</button>\n            </div>\n            <p></p>\n\n            <pre>\n            {{model | json}}\n            </pre>\n        </form>\n    </div>\n</div>\n";
 
 /***/ }),
 /* 30 */
