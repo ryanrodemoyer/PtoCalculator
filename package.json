@@ -2,6 +2,9 @@
   "name": "PtoCalculatorCore",
   "private": true,
   "version": "0.0.0",
+  "engines": {
+    "node": "8.9.0"
+  },
   "scripts": {
     "test": "karma start ClientApp/test/karma.conf.js"
   },
