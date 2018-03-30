@@ -2,23 +2,7 @@
 
 <div class="row">
     <div class="col-md-8">
-        <table class="table">
-            <thead>
-            <tr>
-                <td><strong>Date</strong></td>
-                <td><strong>Used</strong></td>
-                <td><strong>Accrued</strong></td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let row of rows">
-                <td *ngIf="row.isStarting">Starting Accrural</td>
-                <td *ngIf="!row.isStarting">{{row.accrualDate.toDateString()}}</td>
-                <td>{{row.hoursUsed}}</td>
-                <td>{{row.currentAccrual}}</td>
-            </tr>
-            </tbody>
-        </table>
+        <accrual-table [data]="rows"></accrual-table>
     </div>
     <div class="col-md-4">
         <h3 style="margin-top: 0;padding-top: 0;">Configuration</h3>
@@ -49,15 +33,15 @@
 
             <div class="input-group input-group-md">
                 <label for="frequency" class="label label-info">Frequency</label>
-                <select class="form-control selectpicker"  data-width="100%" id="frequency" name="frequency" required
+                <select class="form-control selectpicker" data-width="100%" id="frequency" name="frequency" required
                         [(ngModel)]="model.frequency"
                         #frequency="ngModel">
                     <option *ngFor="let f of frequencies" [value]="f.value">{{f.display}}</option>
                 </select>
             </div>
             <p></p>
-            
-            <div class="input-group input-group-md" [hidden]="frequency == 'biweekly'">
+
+            <div class="input-group input-group-md" *ngIf="model.frequency === 'semi-monthly'">
                 <label for="dayOfPayA" class="label label-info">Pay A</label>
                 <input type="number" class="form-control" placeholder="Day of Pay A" id="dayOfPayA"
                        name="dayOfPayA"
@@ -68,8 +52,8 @@
                 </div>
             </div>
             <p></p>
-            
-            <div class="input-group input-group-md" [hidden]="frequency == 'biweekly'">
+
+            <div class="input-group input-group-md" *ngIf="model.frequency === 'semi-monthly'">
                 <label for="dayOfPayB" class="label label-info">Pay B</label>
                 <input type="number" class="form-control" placeholder="Pay B" id="dayOfPayB"
                        name="dayOfPayB"
@@ -80,9 +64,6 @@
                 </div>
             </div>
             <p></p>
-
-            
-            
 
             <div class="input-group input-group-md">
                 <label for="starting-date" class="label label-info">Starting Date</label>
@@ -114,6 +95,10 @@
 
             <pre>
             {{model | json}}
+            </pre>
+
+            <pre>
+                {{rows | json}}
             </pre>
         </form>
     </div>

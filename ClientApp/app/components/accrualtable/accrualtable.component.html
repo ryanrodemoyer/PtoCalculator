@@ -1,0 +1,39 @@
+<!--<table class="table">-->
+<!--<thead>-->
+<!--<tr>-->
+<!--<td><strong>Date</strong></td>-->
+<!--<td><strong>Used</strong></td>-->
+<!--<td><strong>Accrued</strong></td>-->
+<!--</tr>-->
+<!--</thead>-->
+<!--<tbody>-->
+<!--<tr *ngFor="let d of data">-->
+<!--<td *ngIf="d.isStarting">Starting Accrual</td>-->
+<!--<td *ngIf="!d.isStarting">{{d.accrualDate.toDateString()}}</td>-->
+<!--&lt;!&ndash;<td>{{row.hoursUsed}}</td>&ndash;&gt;-->
+<!--<td>-->
+<!--<div class="col-md-8">-->
+<!--<input class="form-control" type="number" name="hours-used" [(ngModel)]="d.hoursUsed"-->
+<!--#hoursUsed="ngModel" *ngIf="!d.isStarting" />-->
+<!--</div>-->
+<!--</td>-->
+<!--<td>{{d.currentAccrual}}</td>-->
+<!--</tr>-->
+<!--</tbody>-->
+<!--</table>-->
+
+<div class="row">
+    <div class="col-sm-4">Date</div>
+    <div class="col-sm-4">Used</div>
+    <div class="col-sm-4">Accrued</div>
+</div>
+
+<div class="row" *ngFor="let d of data">
+    <div class="col-sm-4" *ngIf="d.isStarting">Starting Accrual</div>
+    <div class="col-sm-4" *ngIf="!d.isStarting">{{d.accrualDate.toDateString()}}</div>
+    <div class="col-sm-4">
+        <input class="form-control" type="number" name="hours-used" [(ngModel)]="d.hoursUsed" #hoursUsed="ngModel"
+               *ngIf="!d.isStarting"/>
+    </div>
+    <div class="col-sm-4">{{d.currentAccrual}}</div>
+</div>

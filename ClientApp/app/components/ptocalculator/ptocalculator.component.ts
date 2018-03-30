@@ -32,7 +32,7 @@ export interface PtoRow {
 class AccrualCalculator {
     constructor(private readonly config: PtoConfiguration) {
     }
-
+    
     private static addMonths(date: Date, number: number) {
         const result = new Date(date);
         result.setMonth(result.getMonth() + number);

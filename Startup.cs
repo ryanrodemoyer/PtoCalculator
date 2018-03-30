@@ -31,13 +31,13 @@ namespace PtoCalculatorCore
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                
-                #if DEBUG
+
+#if DEBUG
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true
                 });
-                #endif
+#endif
             }
             else
             {
@@ -54,7 +54,7 @@ namespace PtoCalculatorCore
 
                 routes.MapSpaFallbackRoute(
                     name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+                    defaults: new {controller = "Home", action = "Index"});
             });
         }
     }
