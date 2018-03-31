@@ -1,7 +1,19 @@
-<div class="col-sm-4" *ngIf="row.isStarting">Starting Accrual</div>
-<div class="col-sm-4" *ngIf="!row.isStarting">{{row.accrualDate.toDateString()}}</div>
-<div class="col-sm-4">
-    <input class="form-control" type="number" name="hours-used" 
-           [ngModel]="row.hoursUsed" (blur)="updateHandler($event.target.value)" *ngIf="!row.isStarting"/>
-</div>
-<div class="col-sm-4">{{row.currentAccrual}}</div>
+<!--<div class="col-sm-4" *ngIf="row.isStarting">Starting Accrual</div>-->
+<!--<div class="col-sm-4" *ngIf="!row.isStarting">{{row.accrualDate.toDateString()}}</div>-->
+<!--<div class="col-sm-4">-->
+    <!--<input class="form-control" type="number" name="hours-used" -->
+           <!--[ngModel]="row.hoursUsed" (blur)="updateHandler($event.target.value)" *ngIf="!row.isStarting"/>-->
+<!--</div>-->
+<!--<div class="col-sm-4">{{row.currentAccrual}}</div>-->
+
+<!--<tr>-->
+    <td *ngIf="row.isStarting">Starting Accrual</td>
+    <td *ngIf="!row.isStarting">{{row.accrualDate.toDateString()}}</td>
+    <td>
+        <!--<div class="col-sm-4">-->
+        <input class="form-control" type="number" name="hours-used"
+               [ngModel]="row.hoursUsed" (blur)="updateHandler($event.target.value)" *ngIf="!row.isStarting"/>
+    <!--</div>-->
+    </td>
+    <td>{{row.currentAccrual}}</td>
+<!--</tr>-->

@@ -1,12 +1,16 @@
-<div class="row">
-    <div class="col-sm-4">Date</div>
-    <div class="col-sm-4">Used</div>
-    <div class="col-sm-4">Accrued</div>
-</div>
+<table class="table">
+    <thead>
+    <tr>
+        <td>Date</td>
+        <td>Used</td>
+        <td>Accrued</td>
+    </tr>
+    </thead>
 
-<div class="row" *ngFor="let r of rows">
-    <accrual-row [row]="r" (rowChanged)="rowChangedHandler($event)"></accrual-row>
-</div>
+    <tbody>
+        <tr *ngFor="let r of rows" [row]="r" (rowChanged)="rowChangedHandler($event)" row></tr>
+    </tbody>
+</table>
 
 <!--<pre>-->
 <!--{{ rows | json}}-->

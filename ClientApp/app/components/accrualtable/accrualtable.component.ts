@@ -136,7 +136,7 @@ class AccrualCalculator {
     styleUrls: ['./accrualtable.component.css']
 })
 export class AccrualTableComponent {
-    private rows: Array<PtoRow>;
+    rows: Array<PtoRow>;
 
     private _config: PtoConfiguration;
 

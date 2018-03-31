@@ -24,30 +24,31 @@ export class ConfigBarComponent {
     @Input()
     config: PtoConfiguration;
     
-    m_startingHours: number;
-    m_accrualRate: number;
-    m_frequency: Frequency;
-    m_startingDate: string;
-    m_dayOfPayA: number;
-    m_dayOfPayB: number;
-    m_ending: Ending;
+    m_startingHours: number | undefined;
+    m_accrualRate: number | undefined;
+    m_frequency: Frequency | undefined;
+    m_startingDate: string | undefined;
+    m_dayOfPayA: number | undefined;
+    m_dayOfPayB: number | undefined;
+    m_ending: Ending | undefined;
     
     @Output()
     public calculate: EventEmitter<PtoConfiguration> = new EventEmitter<PtoConfiguration>();
 
     constructor() {
+        console.log(this.m_accrualRate);
     }
 
     public run() {
         // create a new instance to force change detection to run in other components
         let c = new PtoConfiguration();
-        c.startingHours = this.m_startingHours;
-        c.accrualRate = this.m_accrualRate;
-        c.frequency = this.m_frequency;
-        c.startingDate = this.m_startingDate;
-        c.dayOfPayA = this.m_dayOfPayA;
-        c.dayOfPayB = this.m_dayOfPayB;
-        c.ending = this.m_ending;
+        c.startingHours = this.m_startingHours as number;
+        c.accrualRate = this.m_accrualRate as number;
+        c.frequency = this.m_frequency as Frequency;
+        c.startingDate = this.m_startingDate as string;
+        c.dayOfPayA = this.m_dayOfPayA as number;
+        c.dayOfPayB = this.m_dayOfPayB as number;
+        c.ending = this.m_ending as Ending;
         
         // this.config = c;
         
@@ -63,4 +64,16 @@ export class ConfigBarComponent {
         this.m_dayOfPayB = 21;
         this.m_ending = Ending.PlusOne;
     }
+    
+    // public reset(): void {
+    //     this.m_startingHours = undefined;
+    //     this.m_accrualRate = undefined;
+    //     this.m_frequency = undefined;
+    //     this.m_startingDate = undefined;
+    //     this.m_dayOfPayA = undefined;
+    //     this.m_dayOfPayB = undefined;
+    //     this.m_ending = undefined;
+    //    
+    //     this.calculate.emit(undefined);
+    // }
 }

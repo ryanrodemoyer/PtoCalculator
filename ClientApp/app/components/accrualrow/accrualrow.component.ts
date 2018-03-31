@@ -2,7 +2,7 @@
 import {PtoRow} from "../accrualtable/accrualtable.component";
 
 @Component({
-    selector: 'accrual-row',
+    selector: '[row]',
     templateUrl: './accrualrow.component.html',
     // styleUrls: ['./accrualrow.component.css']
 })
