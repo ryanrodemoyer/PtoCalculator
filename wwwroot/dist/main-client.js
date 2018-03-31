@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "fdabedae593f32f5d75e"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "08bfcdb8966fd4e149c6"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -1801,17 +1801,17 @@ var AccrualCalculator = (function () {
         var filtered = this.rows.filter(function (x) { return x.id !== row.id; });
         filtered.push(row);
         var prev;
+        // sort ascending
         filtered.sort(function (a, b) { return a.id - b.id; });
         filtered.forEach(function (x) {
             if (x.isStarting) {
                 results.push(x);
-                prev = x;
             }
             else {
                 x.currentAccrual = prev.currentAccrual + _this.config.accrualRate - x.hoursUsed;
-                prev = x;
                 results.push(x);
             }
+            prev = x;
         });
         return results;
     };
@@ -1829,7 +1829,6 @@ var AccrualCalculator = (function () {
         var parts = this.config.startingDate.split('-');
         var currentDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
         var endDate = new Date(new Date().getFullYear(), 12, 0);
-        console.log("endDate=" + endDate);
         var addYears = 0;
         switch (this.config.ending) {
             case __WEBPACK_IMPORTED_MODULE_3__ending__["a" /* Ending */].PlusOne:
@@ -1861,20 +1860,15 @@ var AccrualCalculator = (function () {
             else {
                 var day = currentDate.getDate();
                 if (day >= this.config.dayOfPayB) {
-                    // let updatedDate = AccrualCalculator.addMonths(currentDate, 1);
-                    // updatedDate = AccrualCalculator.setDate(currentDate, days.a);
-                    // currentDate = updatedDate;
                     currentDate.setMonth(currentDate.getMonth() + 1);
                     currentDate.setDate(this.config.dayOfPayA);
                 }
                 else {
-                    // currentDate = AccrualCalculator.setDate(currentDate, days.b);
                     currentDate.setDate(this.config.dayOfPayB);
                 }
             }
         }
-        this.rows = rows;
-        return rows;
+        return (this.rows = rows);
     };
     return AccrualCalculator;
 }());
@@ -1887,8 +1881,7 @@ var AccrualTableComponent = (function () {
         },
         set: function (value) {
             this._config = value;
-            console.log("event run in accrualtable = " + JSON.stringify(this.config));
-            if (value != null) {
+            if (value instanceof __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__["a" /* PtoConfiguration */]) {
                 this._calc = new AccrualCalculator(this.config);
                 this.rows = this._calc.Calculate();
             }
@@ -1897,7 +1890,6 @@ var AccrualTableComponent = (function () {
         configurable: true
     });
     AccrualTableComponent.prototype.rowChangedHandler = function (row) {
-        console.log("rowChangedHandler");
         var rows = this._calc.Update(row);
     };
     __decorate([
@@ -1926,6 +1918,8 @@ var AccrualTableComponent = (function () {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ConfigBarComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frequency__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ending__ = __webpack_require__(5);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1935,6 +1929,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+
+
 
 
 var ConfigBarComponent = (function () {
@@ -1954,15 +1950,24 @@ var ConfigBarComponent = (function () {
     ConfigBarComponent.prototype.run = function () {
         // create a new instance to force change detection to run in other components
         var c = new __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__["a" /* PtoConfiguration */]();
-        c.startingHours = this.config.startingHours;
-        c.accrualRate = this.config.accrualRate;
-        c.frequency = this.config.frequency;
-        c.startingDate = this.config.startingDate;
-        c.dayOfPayA = this.config.dayOfPayA;
-        c.dayOfPayB = this.config.dayOfPayB;
-        c.ending = this.config.ending;
-        this.config = c;
-        this.calculate.emit(this.config);
+        c.startingHours = this.m_startingHours;
+        c.accrualRate = this.m_accrualRate;
+        c.frequency = this.m_frequency;
+        c.startingDate = this.m_startingDate;
+        c.dayOfPayA = this.m_dayOfPayA;
+        c.dayOfPayB = this.m_dayOfPayB;
+        c.ending = this.m_ending;
+        // this.config = c;
+        this.calculate.emit(c);
+    };
+    ConfigBarComponent.prototype.loadDefaults = function () {
+        this.m_startingHours = 15;
+        this.m_accrualRate = 7;
+        this.m_frequency = __WEBPACK_IMPORTED_MODULE_2__frequency__["a" /* Frequency */].SemiMonthly;
+        this.m_startingDate = "2018-03-31";
+        this.m_dayOfPayA = 6;
+        this.m_dayOfPayB = 21;
+        this.m_ending = __WEBPACK_IMPORTED_MODULE_3__ending__["a" /* Ending */].PlusOne;
     };
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"])(),
@@ -2123,9 +2128,6 @@ var NavMenuComponent = (function () {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return PtoCalculatorComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ending__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__frequency__ = __webpack_require__(6);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -2136,26 +2138,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
-
-
-
 var PtoCalculatorComponent = (function () {
-    // configForRows: PtoConfiguration;
     function PtoCalculatorComponent() {
-        var config = new __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__["a" /* PtoConfiguration */]();
-        config.startingHours = 0;
-        config.accrualRate = 7;
-        config.frequency = __WEBPACK_IMPORTED_MODULE_3__frequency__["a" /* Frequency */].SemiMonthly;
-        config.startingDate = "2018-01-02";
-        config.dayOfPayA = 6;
-        config.dayOfPayB = 21;
-        config.ending = __WEBPACK_IMPORTED_MODULE_2__ending__["a" /* Ending */].CurrentYear;
-        this.config = config;
     }
     PtoCalculatorComponent.prototype.calculate = function (config) {
-        // this.configForRows = c;
         this.config = config;
-        console.log("event run = " + JSON.stringify(this.config));
     };
     PtoCalculatorComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
@@ -2179,7 +2166,7 @@ exports = module.exports = __webpack_require__(2)(undefined);
 
 
 // module
-exports.push([module.i, ".faux-label{\n    background-color:transparent;\n    border: 0;\n    font-size: 1em;\n}", ""]);
+exports.push([module.i, "", ""]);
 
 // exports
 
@@ -2576,7 +2563,7 @@ module.exports = "<div class=\"col-sm-4\" *ngIf=\"row.isStarting\">Starting Accr
 /* 33 */
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"config\">\n    <div class=\"row\">\n        <div class=\"col-sm-4\">Date</div>\n        <div class=\"col-sm-4\">Used</div>\n        <div class=\"col-sm-4\">Accrued</div>\n    </div>\n\n    <div class=\"row\" *ngFor=\"let r of rows\">\n        <accrual-row [row]=\"r\" (rowChanged)=\"rowChangedHandler($event)\"></accrual-row>\n    </div>\n</div>\n\n<div *ngIf=\"!config\">\n    Waiting for a config...\n</div>\n\n<!--<pre>-->\n    <!--{{ rows | json}}-->\n<!--</pre>-->";
+module.exports = "<div class=\"row\">\n    <div class=\"col-sm-4\">Date</div>\n    <div class=\"col-sm-4\">Used</div>\n    <div class=\"col-sm-4\">Accrued</div>\n</div>\n\n<div class=\"row\" *ngFor=\"let r of rows\">\n    <accrual-row [row]=\"r\" (rowChanged)=\"rowChangedHandler($event)\"></accrual-row>\n</div>\n\n<!--<pre>-->\n<!--{{ rows | json}}-->\n<!--</pre>-->";
 
 /***/ }),
 /* 34 */
@@ -2588,7 +2575,7 @@ module.exports = "<div class='container-fluid'>\n    <div class='row'>\n        
 /* 35 */
 /***/ (function(module, exports) {
 
-module.exports = "<h3 style=\"margin-top: 0;padding-top: 0;\">Configuration</h3>\n<form (ngSubmit)=\"run()\" #configForm=\"ngForm\">\n    <div class=\"input-group input-group-md\">\n        <label for=\"starting-hours\" class=\"label label-info\">Starting Hours</label>\n        <input type=\"number\" class=\"form-control\" placeholder=\"Starting Hours\" id=\"starting-hours\"\n               name=\"starting-hours\" required\n               [(ngModel)]=\"config.startingHours\"\n               #startingHours=\"ngModel\"/>\n        <div [hidden]=\"startingHours.valid || startingHours.pristine\" class=\"alert alert-danger\">\n            Starting Hours is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\">\n        <label for=\"accrual-rate\" class=\"label label-info\">Accrual Rate</label>\n        <input type=\"number\" class=\"form-control\" placeholder=\"Accrual Rate\" id=\"accrual-rate\"\n               name=\"accrual-rate\" required\n               [(ngModel)]=\"config.accrualRate\"\n               #accrualRate=\"ngModel\"/>\n        <div [hidden]=\"accrualRate.valid || accrualRate.pristine\" class=\"alert alert-danger\">\n            Accrual Rate is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\">\n        <label for=\"frequency\" class=\"label label-info\">Frequency</label>\n        <select class=\"form-control selectpicker\" data-width=\"100%\" id=\"frequency\" name=\"frequency\" required\n                [(ngModel)]=\"config.frequency\"\n                #frequency=\"ngModel\">\n            <option *ngFor=\"let f of frequencies\" [value]=\"f.value\">{{f.display}}</option>\n        </select>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\" *ngIf=\"config.frequency === 'semi-monthly'\">\n        <label for=\"dayOfPayA\" class=\"label label-info\">Pay A</label>\n        <input type=\"number\" class=\"form-control\" placeholder=\"Day of Pay A\" id=\"dayOfPayA\"\n               name=\"dayOfPayA\"\n               [(ngModel)]=\"config.dayOfPayA\"\n               #dayOfPayA=\"ngModel\"/>\n        <div [hidden]=\"dayOfPayA.valid || dayOfPayA.pristine\" class=\"alert alert-danger\">\n            Pay A is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\" *ngIf=\"config.frequency === 'semi-monthly'\">\n        <label for=\"dayOfPayB\" class=\"label label-info\">Pay B</label>\n        <input type=\"number\" class=\"form-control\" placeholder=\"Pay B\" id=\"dayOfPayB\"\n               name=\"dayOfPayB\"\n               [(ngModel)]=\"config.dayOfPayB\"\n               #dayOfPayB=\"ngModel\"/>\n        <div [hidden]=\"dayOfPayB.valid || dayOfPayB.pristine\" class=\"alert alert-danger\">\n            Pay B is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\">\n        <label for=\"starting-date\" class=\"label label-info\">Starting Date</label>\n        <input type=\"date\" class=\"form-control\" placeholder=\"(mm/dd/yyyy)\" id=\"starting-date\"\n               name=\"starting-date\"\n               [(ngModel)]=\"config.startingDate\"\n               #startingDate=\"ngModel\"/>\n        <div [hidden]=\"startingDate.valid || startingDate.pristine\" class=\"alert alert-danger\">\n            Starting Date is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\">\n        <label for=\"ending\" class=\"label label-info\">Ending</label>\n        <select class=\"form-control\" data-width=\"fit\" id=\"ending\" name=\"ending\" required\n                [(ngModel)]=\"config.ending\"\n                #ending=\"ngModel\">\n            <option *ngFor=\"let e of endings\" [value]=\"e.value\">{{e.display}}</option>\n        </select>\n    </div>\n    <p></p>\n\n\n    <div class=\"input-group input-group-md\">\n        <button class=\"btn btn-success\" name=\"calculate\" [disabled]=\"!configForm.form.valid\">Calculate!</button>\n    </div>\n    <p></p>\n\n    <pre>\n        {{config | json}}\n    </pre>\n</form>\n";
+module.exports = "<h3 style=\"margin-top: 0;padding-top: 0;\">Configuration</h3>\n<small><a (click)=\"loadDefaults()\">(load defaults)</a></small>\n<form (ngSubmit)=\"run()\" #configForm=\"ngForm\">\n    <div class=\"input-group input-group-md\">\n        <label for=\"starting-hours\" class=\"label label-info\">Starting Hours</label>\n        <input type=\"number\" class=\"form-control\" placeholder=\"Starting Hours\" id=\"starting-hours\"\n               name=\"starting-hours\" required\n               [(ngModel)]=\"m_startingHours\"\n               #startingHours=\"ngModel\"/>\n        <div [hidden]=\"startingHours.valid || startingHours.pristine\" class=\"alert alert-danger\">\n            Starting Hours is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\">\n        <label for=\"accrual-rate\" class=\"label label-info\">Accrual Rate</label>\n        <input type=\"number\" class=\"form-control\" placeholder=\"Accrual Rate\" id=\"accrual-rate\"\n               name=\"accrual-rate\" required\n               [(ngModel)]=\"m_accrualRate\"\n               #accrualRate=\"ngModel\"/>\n        <div [hidden]=\"accrualRate.valid || accrualRate.pristine\" class=\"alert alert-danger\">\n            Accrual Rate is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\">\n        <label for=\"frequency\" class=\"label label-info\">Frequency</label>\n        <select class=\"form-control selectpicker\" data-width=\"100%\" id=\"frequency\" name=\"frequency\" required\n                [(ngModel)]=\"m_frequency\"\n                #frequency=\"ngModel\">\n            <option *ngFor=\"let f of frequencies\" [value]=\"f.value\">{{f.display}}</option>\n        </select>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\" *ngIf=\"m_frequency === 'semi-monthly'\">\n        <label for=\"dayOfPayA\" class=\"label label-info\">Pay A</label>\n        <input type=\"number\" class=\"form-control\" placeholder=\"Day of Pay A\" id=\"dayOfPayA\"\n               name=\"dayOfPayA\"\n               [(ngModel)]=\"m_dayOfPayA\"\n               #dayOfPayA=\"ngModel\"/>\n        <div [hidden]=\"dayOfPayA.valid || dayOfPayA.pristine\" class=\"alert alert-danger\">\n            Pay A is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\" *ngIf=\"m_frequency === 'semi-monthly'\">\n        <label for=\"dayOfPayB\" class=\"label label-info\">Pay B</label>\n        <input type=\"number\" class=\"form-control\" placeholder=\"Pay B\" id=\"dayOfPayB\"\n               name=\"dayOfPayB\"\n               [(ngModel)]=\"m_dayOfPayB\"\n               #dayOfPayB=\"ngModel\"/>\n        <div [hidden]=\"dayOfPayB.valid || dayOfPayB.pristine\" class=\"alert alert-danger\">\n            Pay B is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\">\n        <label for=\"starting-date\" class=\"label label-info\">Starting Date</label>\n        <input type=\"date\" class=\"form-control\" placeholder=\"(mm/dd/yyyy)\" id=\"starting-date\"\n               name=\"starting-date\"\n               [(ngModel)]=\"m_startingDate\"\n               #startingDate=\"ngModel\"/>\n        <div [hidden]=\"startingDate.valid || startingDate.pristine\" class=\"alert alert-danger\">\n            Starting Date is required.\n        </div>\n    </div>\n    <p></p>\n\n    <div class=\"input-group input-group-md\">\n        <label for=\"ending\" class=\"label label-info\">Ending</label>\n        <select class=\"form-control\" data-width=\"fit\" id=\"ending\" name=\"ending\" required\n                [(ngModel)]=\"m_ending\"\n                #ending=\"ngModel\">\n            <option *ngFor=\"let e of endings\" [value]=\"e.value\">{{e.display}}</option>\n        </select>\n    </div>\n    <p></p>\n\n\n    <div class=\"input-group input-group-md\">\n        <button class=\"btn btn-success\" name=\"calculate\" [disabled]=\"!configForm.form.valid\">Calculate!</button>\n    </div>\n    <p></p>\n\n    <pre>\n        {{config | json}}\n    </pre>\n</form>\n";
 
 /***/ }),
 /* 36 */
@@ -2618,7 +2605,7 @@ module.exports = "<div class='main-nav'>\n    <div class='navbar navbar-inverse'
 /* 40 */
 /***/ (function(module, exports) {
 
-module.exports = "<h1>PTO Accrual Calculator</h1>\n\n<div class=\"row\">\n    <div class=\"col-md-8\">\n        <accrual-table [config]=\"config\"></accrual-table>\n    </div>\n    <div class=\"col-md-4\">\n        <config-bar [config]=\"config\" (calculate)=\"calculate($event)\"></config-bar>\n    </div>\n</div>\n";
+module.exports = "<h1>PTO Accrual Calculator</h1>\n\n<div class=\"row\">\n    <div class=\"col-md-8\">\n        <accrual-table *ngIf=\"config\" [config]=\"config\"></accrual-table>\n\n        <div *ngIf=\"!config\">\n            Use the config bar (to the right)...\n        </div>\n    </div>\n    <div class=\"col-md-4\">\n        <config-bar [config]=\"config\" (calculate)=\"calculate($event)\"></config-bar>\n    </div>\n</div>";
 
 /***/ }),
 /* 41 */

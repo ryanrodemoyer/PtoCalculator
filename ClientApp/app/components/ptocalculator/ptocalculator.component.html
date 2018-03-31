@@ -2,7 +2,11 @@
 
 <div class="row">
     <div class="col-md-8">
-        <accrual-table [config]="config"></accrual-table>
+        <accrual-table *ngIf="config" [config]="config"></accrual-table>
+
+        <div *ngIf="!config">
+            Use the config bar (to the right)...
+        </div>
     </div>
     <div class="col-md-4">
         <config-bar [config]="config" (calculate)="calculate($event)"></config-bar>

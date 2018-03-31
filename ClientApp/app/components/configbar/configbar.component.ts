@@ -1,5 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {PtoConfiguration} from "../../ptoconfiguration";
+import {Frequency} from "../../frequency";
+import {Ending} from "../../ending";
 
 @Component({
     selector: 'config-bar',
@@ -22,6 +24,14 @@ export class ConfigBarComponent {
     @Input()
     config: PtoConfiguration;
     
+    m_startingHours: number;
+    m_accrualRate: number;
+    m_frequency: Frequency;
+    m_startingDate: string;
+    m_dayOfPayA: number;
+    m_dayOfPayB: number;
+    m_ending: Ending;
+    
     @Output()
     public calculate: EventEmitter<PtoConfiguration> = new EventEmitter<PtoConfiguration>();
 
@@ -31,16 +41,26 @@ export class ConfigBarComponent {
     public run() {
         // create a new instance to force change detection to run in other components
         let c = new PtoConfiguration();
-        c.startingHours = this.config.startingHours;
-        c.accrualRate = this.config.accrualRate;
-        c.frequency = this.config.frequency;
-        c.startingDate = this.config.startingDate;
-        c.dayOfPayA = this.config.dayOfPayA;
-        c.dayOfPayB = this.config.dayOfPayB;
-        c.ending = this.config.ending;
+        c.startingHours = this.m_startingHours;
+        c.accrualRate = this.m_accrualRate;
+        c.frequency = this.m_frequency;
+        c.startingDate = this.m_startingDate;
+        c.dayOfPayA = this.m_dayOfPayA;
+        c.dayOfPayB = this.m_dayOfPayB;
+        c.ending = this.m_ending;
         
-        this.config = c;
+        // this.config = c;
         
-        this.calculate.emit(this.config);
+        this.calculate.emit(c);
+    }
+
+    public loadDefaults(): void {
+        this.m_startingHours = 15;
+        this.m_accrualRate = 7;
+        this.m_frequency = Frequency.SemiMonthly;
+        this.m_startingDate = "2018-03-31";
+        this.m_dayOfPayA = 6;
+        this.m_dayOfPayB = 21;
+        this.m_ending = Ending.PlusOne;
     }
 }

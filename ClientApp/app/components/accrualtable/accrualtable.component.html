@@ -1,19 +1,13 @@
-<div *ngIf="config">
-    <div class="row">
-        <div class="col-sm-4">Date</div>
-        <div class="col-sm-4">Used</div>
-        <div class="col-sm-4">Accrued</div>
-    </div>
-
-    <div class="row" *ngFor="let r of rows">
-        <accrual-row [row]="r" (rowChanged)="rowChangedHandler($event)"></accrual-row>
-    </div>
+<div class="row">
+    <div class="col-sm-4">Date</div>
+    <div class="col-sm-4">Used</div>
+    <div class="col-sm-4">Accrued</div>
 </div>
 
-<div *ngIf="!config">
-    Waiting for a config...
+<div class="row" *ngFor="let r of rows">
+    <accrual-row [row]="r" (rowChanged)="rowChangedHandler($event)"></accrual-row>
 </div>
 
 <!--<pre>-->
-    <!--{{ rows | json}}-->
+<!--{{ rows | json}}-->
 <!--</pre>-->
