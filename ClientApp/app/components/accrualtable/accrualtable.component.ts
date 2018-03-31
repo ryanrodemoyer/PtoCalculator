@@ -7,7 +7,7 @@ export interface PtoRow {
     id: number;
     isStarting: boolean,
     accrualDate: Date | null,
-    hoursUsed: number | null,
+    hoursUsed: number,
     currentAccrual: number,
 }
 
@@ -32,6 +32,33 @@ class AccrualCalculator {
         result.setDate(dayOfMonth);
         return result;
     }
+    
+    private rows: Array<PtoRow>;
+    
+    public Update(row: PtoRow): Array<PtoRow> {
+        const results: Array<PtoRow> = [];
+        
+        const filtered = this.rows.filter(x => x.id !== row.id);
+        filtered.push(row);
+        
+        let prev: PtoRow;
+
+        filtered.sort((a, b) => a.id - b.id );
+        
+        filtered.forEach(x => {
+            if (x.isStarting) {
+                results.push(x);
+                prev = x;
+            }
+            else {
+                x.currentAccrual = prev.currentAccrual + this.config.accrualRate - x.hoursUsed;
+                prev = x;
+                results.push(x);
+            }
+        });
+        
+        return results;
+    }
 
     public Calculate(): Array<PtoRow> {
         const rows = [];
@@ -42,7 +69,7 @@ class AccrualCalculator {
             id: 0,
             isStarting: true,
             accrualDate: null,
-            hoursUsed: null,
+            hoursUsed: 0,
             currentAccrual: accrual,
         };
 
@@ -73,9 +100,6 @@ class AccrualCalculator {
         let counter = 0;
         while (currentDate <= endDate) {
             counter++;
-            // if (counter === 10) {
-            //     // return rows;
-            // }
 
             accrual += this.config.accrualRate;
 
@@ -107,6 +131,8 @@ class AccrualCalculator {
             }
         }
 
+        this.rows = rows;
+        
         return rows;
     }
 }
@@ -124,6 +150,8 @@ export class AccrualTableComponent {
     public get config(): PtoConfiguration {
         return this._config;
     }
+    
+    private _calc: AccrualCalculator;
 
     @Input()
     public set config(value: PtoConfiguration) {
@@ -133,10 +161,17 @@ export class AccrualTableComponent {
 
         if (value != null) 
         {
-            this.rows = new AccrualCalculator(this.config).Calculate();
+            this._calc = new AccrualCalculator(this.config);
+            this.rows = this._calc.Calculate();
         }
     }
 
     constructor() {
+    }
+    
+    public rowChangedHandler(row: PtoRow): void {
+        console.log(`rowChangedHandler`);
+        
+        const rows = this._calc.Update(row);
     }
 }

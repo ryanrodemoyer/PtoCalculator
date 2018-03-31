@@ -11,7 +11,7 @@ import {Frequency} from "../../frequency";
 export class PtoCalculatorComponent {
     config: PtoConfiguration;
     
-    configForRows: PtoConfiguration;
+    // configForRows: PtoConfiguration;
 
     constructor() {
         const config = new PtoConfiguration();
@@ -27,16 +27,9 @@ export class PtoCalculatorComponent {
     }
     
     public calculate(config: PtoConfiguration): void {
-        let c = new PtoConfiguration();
-        c.startingHours = config.startingHours;
-        c.accrualRate = config.accrualRate;
-        c.frequency = config.frequency;
-        c.startingDate = config.startingDate;
-        c.dayOfPayA = config.dayOfPayA;
-        c.dayOfPayB = config.dayOfPayB;
-        c.ending = config.ending;
         
-        this.configForRows = c;
+        
+        // this.configForRows = c;
         
         this.config = config;
         

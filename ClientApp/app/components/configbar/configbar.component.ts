@@ -29,7 +29,18 @@ export class ConfigBarComponent {
     }
 
     public run() {
-        console.log(`run`);
+        // create a new instance to force change detection to run in other components
+        let c = new PtoConfiguration();
+        c.startingHours = this.config.startingHours;
+        c.accrualRate = this.config.accrualRate;
+        c.frequency = this.config.frequency;
+        c.startingDate = this.config.startingDate;
+        c.dayOfPayA = this.config.dayOfPayA;
+        c.dayOfPayB = this.config.dayOfPayB;
+        c.ending = this.config.ending;
+        
+        this.config = c;
+        
         this.calculate.emit(this.config);
     }
 }

@@ -6,7 +6,7 @@
     </div>
 
     <div class="row" *ngFor="let r of rows">
-        <accrual-row [row]="r"></accrual-row>
+        <accrual-row [row]="r" (rowChanged)="rowChangedHandler($event)"></accrual-row>
     </div>
 </div>
 

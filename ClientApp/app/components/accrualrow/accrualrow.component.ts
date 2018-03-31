@@ -16,12 +16,10 @@ export class AccrualRowComponent {
 
     public set row(value: PtoRow) {
         this._row = value;
-
-        // this.rowChanged.next(value);
     }
 
     @Output()
-    public rowChanged: EventEmitter<PtoRow>;
+    public rowChanged: EventEmitter<PtoRow> = new EventEmitter<PtoRow>();
 
     constructor() {
     }
@@ -30,6 +28,8 @@ export class AccrualRowComponent {
         if (value !== this.row.hoursUsed) {
             console.log(`control # ${this.row.id}, currentvalue=${this.row.hoursUsed}, newvalue=${value}`);
             this._row.hoursUsed = value;
+            
+            this.rowChanged.emit(this._row);
         }
     }
 }

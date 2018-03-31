@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "946b2dc18ea3521e8c3d"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "fdabedae593f32f5d75e"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -1713,6 +1713,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 var AccrualRowComponent = (function () {
     function AccrualRowComponent() {
+        this.rowChanged = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["EventEmitter"]();
     }
     Object.defineProperty(AccrualRowComponent.prototype, "row", {
         get: function () {
@@ -1720,7 +1721,6 @@ var AccrualRowComponent = (function () {
         },
         set: function (value) {
             this._row = value;
-            // this.rowChanged.next(value);
         },
         enumerable: true,
         configurable: true
@@ -1729,6 +1729,7 @@ var AccrualRowComponent = (function () {
         if (value !== this.row.hoursUsed) {
             console.log("control # " + this.row.id + ", currentvalue=" + this.row.hoursUsed + ", newvalue=" + value);
             this._row.hoursUsed = value;
+            this.rowChanged.emit(this._row);
         }
     };
     __decorate([
@@ -1794,6 +1795,26 @@ var AccrualCalculator = (function () {
         result.setDate(dayOfMonth);
         return result;
     };
+    AccrualCalculator.prototype.Update = function (row) {
+        var _this = this;
+        var results = [];
+        var filtered = this.rows.filter(function (x) { return x.id !== row.id; });
+        filtered.push(row);
+        var prev;
+        filtered.sort(function (a, b) { return a.id - b.id; });
+        filtered.forEach(function (x) {
+            if (x.isStarting) {
+                results.push(x);
+                prev = x;
+            }
+            else {
+                x.currentAccrual = prev.currentAccrual + _this.config.accrualRate - x.hoursUsed;
+                prev = x;
+                results.push(x);
+            }
+        });
+        return results;
+    };
     AccrualCalculator.prototype.Calculate = function () {
         var rows = [];
         var accrual = this.config.startingHours;
@@ -1801,7 +1822,7 @@ var AccrualCalculator = (function () {
             id: 0,
             isStarting: true,
             accrualDate: null,
-            hoursUsed: null,
+            hoursUsed: 0,
             currentAccrual: accrual,
         };
         rows.push(startingRow);
@@ -1825,9 +1846,6 @@ var AccrualCalculator = (function () {
         var counter = 0;
         while (currentDate <= endDate) {
             counter++;
-            // if (counter === 10) {
-            //     // return rows;
-            // }
             accrual += this.config.accrualRate;
             var row = {
                 id: counter,
@@ -1855,6 +1873,7 @@ var AccrualCalculator = (function () {
                 }
             }
         }
+        this.rows = rows;
         return rows;
     };
     return AccrualCalculator;
@@ -1870,12 +1889,17 @@ var AccrualTableComponent = (function () {
             this._config = value;
             console.log("event run in accrualtable = " + JSON.stringify(this.config));
             if (value != null) {
-                this.rows = new AccrualCalculator(this.config).Calculate();
+                this._calc = new AccrualCalculator(this.config);
+                this.rows = this._calc.Calculate();
             }
         },
         enumerable: true,
         configurable: true
     });
+    AccrualTableComponent.prototype.rowChangedHandler = function (row) {
+        console.log("rowChangedHandler");
+        var rows = this._calc.Update(row);
+    };
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Input"])(),
         __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__["a" /* PtoConfiguration */]),
@@ -1928,7 +1952,16 @@ var ConfigBarComponent = (function () {
         this.calculate = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["EventEmitter"]();
     }
     ConfigBarComponent.prototype.run = function () {
-        console.log("run");
+        // create a new instance to force change detection to run in other components
+        var c = new __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__["a" /* PtoConfiguration */]();
+        c.startingHours = this.config.startingHours;
+        c.accrualRate = this.config.accrualRate;
+        c.frequency = this.config.frequency;
+        c.startingDate = this.config.startingDate;
+        c.dayOfPayA = this.config.dayOfPayA;
+        c.dayOfPayB = this.config.dayOfPayB;
+        c.ending = this.config.ending;
+        this.config = c;
         this.calculate.emit(this.config);
     };
     __decorate([
@@ -2107,6 +2140,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 var PtoCalculatorComponent = (function () {
+    // configForRows: PtoConfiguration;
     function PtoCalculatorComponent() {
         var config = new __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__["a" /* PtoConfiguration */]();
         config.startingHours = 0;
@@ -2119,15 +2153,7 @@ var PtoCalculatorComponent = (function () {
         this.config = config;
     }
     PtoCalculatorComponent.prototype.calculate = function (config) {
-        var c = new __WEBPACK_IMPORTED_MODULE_1__ptoconfiguration__["a" /* PtoConfiguration */]();
-        c.startingHours = config.startingHours;
-        c.accrualRate = config.accrualRate;
-        c.frequency = config.frequency;
-        c.startingDate = config.startingDate;
-        c.dayOfPayA = config.dayOfPayA;
-        c.dayOfPayB = config.dayOfPayB;
-        c.ending = config.ending;
-        this.configForRows = c;
+        // this.configForRows = c;
         this.config = config;
         console.log("event run = " + JSON.stringify(this.config));
     };
@@ -2550,7 +2576,7 @@ module.exports = "<div class=\"col-sm-4\" *ngIf=\"row.isStarting\">Starting Accr
 /* 33 */
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"config\">\n    <div class=\"row\">\n        <div class=\"col-sm-4\">Date</div>\n        <div class=\"col-sm-4\">Used</div>\n        <div class=\"col-sm-4\">Accrued</div>\n    </div>\n\n    <div class=\"row\" *ngFor=\"let r of rows\">\n        <accrual-row [row]=\"r\"></accrual-row>\n    </div>\n</div>\n\n<div *ngIf=\"!config\">\n    Waiting for a config...\n</div>\n\n<!--<pre>-->\n    <!--{{ rows | json}}-->\n<!--</pre>-->";
+module.exports = "<div *ngIf=\"config\">\n    <div class=\"row\">\n        <div class=\"col-sm-4\">Date</div>\n        <div class=\"col-sm-4\">Used</div>\n        <div class=\"col-sm-4\">Accrued</div>\n    </div>\n\n    <div class=\"row\" *ngFor=\"let r of rows\">\n        <accrual-row [row]=\"r\" (rowChanged)=\"rowChangedHandler($event)\"></accrual-row>\n    </div>\n</div>\n\n<div *ngIf=\"!config\">\n    Waiting for a config...\n</div>\n\n<!--<pre>-->\n    <!--{{ rows | json}}-->\n<!--</pre>-->";
 
 /***/ }),
 /* 34 */
@@ -2592,7 +2618,7 @@ module.exports = "<div class='main-nav'>\n    <div class='navbar navbar-inverse'
 /* 40 */
 /***/ (function(module, exports) {
 
-module.exports = "<h1>PTO Accrual Calculator</h1>\n\n<div class=\"row\">\n    <div class=\"col-md-8\">\n        <accrual-table [config]=\"configForRows\"></accrual-table>\n    </div>\n    <div class=\"col-md-4\">\n        <config-bar [config]=\"config\" (calculate)=\"calculate($event)\"></config-bar>\n    </div>\n</div>\n";
+module.exports = "<h1>PTO Accrual Calculator</h1>\n\n<div class=\"row\">\n    <div class=\"col-md-8\">\n        <accrual-table [config]=\"config\"></accrual-table>\n    </div>\n    <div class=\"col-md-4\">\n        <config-bar [config]=\"config\" (calculate)=\"calculate($event)\"></config-bar>\n    </div>\n</div>\n";
 
 /***/ }),
 /* 41 */
