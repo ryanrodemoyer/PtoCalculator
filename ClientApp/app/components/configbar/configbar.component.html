@@ -1,0 +1,92 @@
+<h3 style="margin-top: 0;padding-top: 0;">Configuration</h3>
+<form (ngSubmit)="run()" #configForm="ngForm">
+    <div class="input-group input-group-md">
+        <label for="starting-hours" class="label label-info">Starting Hours</label>
+        <input type="number" class="form-control" placeholder="Starting Hours" id="starting-hours"
+               name="starting-hours" required
+               [(ngModel)]="config.startingHours"
+               #startingHours="ngModel"/>
+        <div [hidden]="startingHours.valid || startingHours.pristine" class="alert alert-danger">
+            Starting Hours is required.
+        </div>
+    </div>
+    <p></p>
+
+    <div class="input-group input-group-md">
+        <label for="accrual-rate" class="label label-info">Accrual Rate</label>
+        <input type="number" class="form-control" placeholder="Accrual Rate" id="accrual-rate"
+               name="accrual-rate" required
+               [(ngModel)]="config.accrualRate"
+               #accrualRate="ngModel"/>
+        <div [hidden]="accrualRate.valid || accrualRate.pristine" class="alert alert-danger">
+            Accrual Rate is required.
+        </div>
+    </div>
+    <p></p>
+
+    <div class="input-group input-group-md">
+        <label for="frequency" class="label label-info">Frequency</label>
+        <select class="form-control selectpicker" data-width="100%" id="frequency" name="frequency" required
+                [(ngModel)]="config.frequency"
+                #frequency="ngModel">
+            <option *ngFor="let f of frequencies" [value]="f.value">{{f.display}}</option>
+        </select>
+    </div>
+    <p></p>
+
+    <div class="input-group input-group-md" *ngIf="config.frequency === 'semi-monthly'">
+        <label for="dayOfPayA" class="label label-info">Pay A</label>
+        <input type="number" class="form-control" placeholder="Day of Pay A" id="dayOfPayA"
+               name="dayOfPayA"
+               [(ngModel)]="config.dayOfPayA"
+               #dayOfPayA="ngModel"/>
+        <div [hidden]="dayOfPayA.valid || dayOfPayA.pristine" class="alert alert-danger">
+            Pay A is required.
+        </div>
+    </div>
+    <p></p>
+
+    <div class="input-group input-group-md" *ngIf="config.frequency === 'semi-monthly'">
+        <label for="dayOfPayB" class="label label-info">Pay B</label>
+        <input type="number" class="form-control" placeholder="Pay B" id="dayOfPayB"
+               name="dayOfPayB"
+               [(ngModel)]="config.dayOfPayB"
+               #dayOfPayB="ngModel"/>
+        <div [hidden]="dayOfPayB.valid || dayOfPayB.pristine" class="alert alert-danger">
+            Pay B is required.
+        </div>
+    </div>
+    <p></p>
+
+    <div class="input-group input-group-md">
+        <label for="starting-date" class="label label-info">Starting Date</label>
+        <input type="date" class="form-control" placeholder="(mm/dd/yyyy)" id="starting-date"
+               name="starting-date"
+               [(ngModel)]="config.startingDate"
+               #startingDate="ngModel"/>
+        <div [hidden]="startingDate.valid || startingDate.pristine" class="alert alert-danger">
+            Starting Date is required.
+        </div>
+    </div>
+    <p></p>
+
+    <div class="input-group input-group-md">
+        <label for="ending" class="label label-info">Ending</label>
+        <select class="form-control" data-width="fit" id="ending" name="ending" required
+                [(ngModel)]="config.ending"
+                #ending="ngModel">
+            <option *ngFor="let e of endings" [value]="e.value">{{e.display}}</option>
+        </select>
+    </div>
+    <p></p>
+
+
+    <div class="input-group input-group-md">
+        <button class="btn btn-success" name="calculate" [disabled]="!configForm.form.valid">Calculate!</button>
+    </div>
+    <p></p>
+
+    <pre>
+        {{config | json}}
+    </pre>
+</form>

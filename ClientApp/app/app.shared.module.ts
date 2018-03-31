@@ -11,6 +11,8 @@ import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
 import { CounterComponent } from './components/counter/counter.component';
 import {PtoCalculatorComponent} from "./components/ptocalculator/ptocalculator.component";
 import {AccrualTableComponent} from "./components/accrualtable/accrualtable.component";
+import {AccrualRowComponent} from "./components/accrualrow/accrualrow.component";
+import {ConfigBarComponent} from "./components/configbar/configbar.component";
 
 @NgModule({
     declarations: [
@@ -20,6 +22,8 @@ import {AccrualTableComponent} from "./components/accrualtable/accrualtable.comp
         FetchDataComponent,
         PtoCalculatorComponent,
         AccrualTableComponent,
+        AccrualRowComponent,
+        ConfigBarComponent,
         HomeComponent
     ],
     imports: [
